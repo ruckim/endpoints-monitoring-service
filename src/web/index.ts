@@ -5,6 +5,7 @@ import {monitoredEndpointsRouter} from "./routes/monitored-endpoints";
 
 export const app = new Koa()
 
+// TODO auth middleware
 app.use(morgan('tiny'))
 // figure out /api/v1/
 app.use(monitoredEndpointsRouter.middleware())

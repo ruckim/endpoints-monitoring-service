@@ -6,6 +6,7 @@ export interface MonitoredEndpoint {
     url: string;
     dateOfCreation: Date;
     dateOfLastCheck: Date;
+    // TODO better naming
     monitoredInterval: number;
     ownerId: User["id"];
 }
