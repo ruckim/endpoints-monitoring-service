@@ -1,3 +1,5 @@
 {
-  "name": "Endpoints Monitoring Service - Test"
+  "environment": "test",
+  "name": "Endpoints Monitoring Service - Test",
+
 }

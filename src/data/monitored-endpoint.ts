@@ -6,9 +6,11 @@ export interface MonitoredEndpoint {
     url: string;
     dateOfCreation: Date;
     dateOfLastCheck: Date;
-    // TODO better naming
+    // TODO better naming - include units somehow 'seconds'
     monitoredInterval: number;
     ownerId: User["id"];
+    // field saying time of next check. Is calculated.
+    dateOfNextCheck: Date;
 }
 
 export function mockMonitoredEndpoint(data: Partial<MonitoredEndpoint>): MonitoredEndpoint {
@@ -19,6 +21,7 @@ export function mockMonitoredEndpoint(data: Partial<MonitoredEndpoint>): Monitor
         dateOfCreation: new Date("2021-12-12 05:00:00"),
         dateOfLastCheck: new Date("2021-12-12 07:00:00"),
         monitoredInterval: 30,
+        dateOfNextCheck: new Date("2021-12-12 07:30:00"),
         ownerId: 1,
         ...data
     }
