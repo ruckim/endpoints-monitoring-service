@@ -6,7 +6,7 @@ export const monitoredEndpoints = [
     url: "http://localhost/first-endpoint",
     date_of_creation: new Date("2020-01-25T08:40:51.620Z"),
     date_of_last_check: new Date("2020-01-26T08:40:51.620Z"),
-    monitored_interval: 30,
+    monitored_interval: 10,
     owner_id: 1,
   },
   {
@@ -15,16 +15,16 @@ export const monitoredEndpoints = [
     url: "http://localhost/second-endpoint",
     date_of_creation: new Date("2020-01-27T08:40:51.620Z"),
     date_of_last_check: new Date("2020-01-28T08:40:51.620Z"),
-    monitored_interval: 10,
+    monitored_interval: 5,
     owner_id: 2,
   },
   {
     id: 3,
     name: "third endpoint",
-    url: "http://localhost/second-endpoint",
+    url: "http://localhost/third-endpoint",
     date_of_creation: new Date("2020-01-28T08:40:51.620Z"),
     date_of_last_check: new Date("2020-01-29T08:40:51.620Z"),
-    monitored_interval: 100,
+    monitored_interval: 15,
     owner_id: 2,
   },
 ];

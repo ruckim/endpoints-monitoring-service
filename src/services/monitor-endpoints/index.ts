@@ -3,7 +3,7 @@ import { EndpointMonitor } from "./endpoint-monitor";
 
 export async function startMonitoring() {
   const endpoints = await getAllMonitoredEndpoints();
-  // every endpoint will have its own process calling uri at given time
+
   const runningMonitors = endpoints.map((endpoint) =>
     new EndpointMonitor(endpoint).start()
   );

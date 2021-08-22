@@ -1,37 +1,77 @@
 import got from "got";
 import { MonitoredEndpoint } from "../../data/monitored-endpoint";
 import { MonitoringResult } from "../../data/monitoring-result";
+import { createMonitoringResult } from "../../db/queries";
 
 export class EndpointMonitor {
   endpointId: number;
-  frequencyInSeconds: number;
+  endpointOwnerId: number;
+  frequencyInMs: number;
   url: string;
+  lastCheckedAt?: Date;
 
   constructor(endpoint: MonitoredEndpoint) {
     this.endpointId = endpoint.id;
-    this.frequencyInSeconds = endpoint.monitoredInterval;
+    this.endpointOwnerId = endpoint.ownerId;
+    this.frequencyInMs = endpoint.monitoredInterval * 1000;
     this.url = endpoint.url;
+    this.lastCheckedAt = endpoint.dateOfLastCheck;
+  }
+
+  shouldWaitForNextCheckMs(checkInterval: number, lastCheckedAt?: Date) {
+    if (!lastCheckedAt) return 0;
+
+    const nowInMs = new Date().getTime();
+    const lastCheckedAtInMs = lastCheckedAt.getTime();
+    const msFromLastCheck = nowInMs - lastCheckedAtInMs;
+    if (msFromLastCheck >= checkInterval) {
+      return 0;
+    } else {
+      return checkInterval - msFromLastCheck;
+    }
   }
 
   async callEndpoint(url: string): Promise<Omit<MonitoringResult, "id">> {
-    const result = await got.get(url);
+    console.log(
+      `Call url: ${this.url} \nendpoint id: ${this.endpointId} \nuser id ${this.endpointOwnerId}`
+    );
+    let endpointCheckResult;
+    try {
+      endpointCheckResult = await got.get(url);
+      console.log(
+        `url: ${this.url} \nstatusCode: ${endpointCheckResult?.statusCode} \npayload: ${endpointCheckResult?.body}`
+      );
+    } catch (e) {
+      console.error({
+        message: `Failed api call endpoint id: ${this.endpointId} \nuser id: ${this.endpointOwnerId}`,
+        error: e.message,
+      });
+    }
+
     return {
       dateOfCheck: new Date(),
-      returnedHttpStatusCode: result.statusCode,
-      returnedPayload: result.body,
+      returnedHttpStatusCode: endpointCheckResult?.statusCode,
+      returnedPayload: endpointCheckResult?.body,
       monitoredEndpointId: this.endpointId,
     };
   }
 
   async save(resultData: Omit<MonitoringResult, "id">) {
-    await
+    await createMonitoringResult(resultData);
   }
 
   start() {
-    setInterval(async () => {
-      const monitoringResultData: Omit<MonitoringResult, "id"> =
-        await this.callEndpoint(this.url);
-      await this.save(monitoringResultData);
-    }, this.frequencyInSeconds);
+    const msToWait = this.shouldWaitForNextCheckMs(
+      this.frequencyInMs,
+      this.lastCheckedAt
+    );
+    setTimeout(() => {
+      setInterval(async () => {
+        const monitoringResultData: Omit<MonitoringResult, "id"> =
+          await this.callEndpoint(this.url);
+        await this.save(monitoringResultData);
+        // update date of last check
+      }, this.frequencyInMs);
+    }, msToWait);
   }
 }

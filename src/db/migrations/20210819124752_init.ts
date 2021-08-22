@@ -12,7 +12,10 @@ export async function up(knex: Knex): Promise<void> {
       table.increments("id").primary();
       table.text("name");
       table.text("url");
-      table.timestamp("date_of_creation");
+      table
+        .timestamp("date_of_creation")
+        .notNullable()
+        .defaultTo(knex.fn.now());
       table.timestamp("date_of_last_check").nullable();
       table.integer("monitored_interval");
       table.integer("owner_id").references("id").inTable("users");
@@ -33,5 +36,5 @@ export async function down(knex: Knex): Promise<void> {
   return knex.schema
     .dropTable("monitoring_results")
     .dropTable("monitored_endpoints")
-    .dropTable("users")
+    .dropTable("users");
 }

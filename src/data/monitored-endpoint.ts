@@ -5,7 +5,7 @@ export interface MonitoredEndpoint {
     name: string;
     url: string;
     dateOfCreation: Date;
-    dateOfLastCheck: Date;
+    dateOfLastCheck?: Date;
     // TODO better naming - include units somehow 'seconds'
     monitoredInterval: number;
     ownerId: User["id"];

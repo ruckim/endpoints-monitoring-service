@@ -1,8 +1,7 @@
 import { connection as knex } from "./knex";
 import { MonitoredEndpoint } from "../data/monitored-endpoint";
-import {MonitoringResult} from "../data/monitoring-result";
+import { MonitoringResult } from "../data/monitoring-result";
 
-// TODO TS interface to knex schema - figure out mapping automatically, avoid duplication
 export async function getAllMonitoredEndpoints() {
   return await knex("monitored_endpoints").select();
 }
@@ -26,17 +25,11 @@ export async function getOneMonitoredEndpointById(
 export async function createMonitoredEndpoint(
   monitoredEndpointData: MonitoredEndpoint
 ) {
-  // move transforming data layer above
-  // here comes only query, no mapping logic
-  const dbInput = {
-    name: monitoredEndpointData.name,
-    url: monitoredEndpointData.url,
-    date_of_creation: new Date(),
-    date_of_last_check: null,
-    monitored_interval: monitoredEndpointData.monitoredInterval,
-    owner_id: monitoredEndpointData.ownerId,
-  };
-  return (await knex("monitored_endpoints").insert(dbInput).returning("*"))[0];
+  return (
+    await knex("monitored_endpoints")
+      .insert(monitoredEndpointData)
+      .returning("*")
+  )[0];
 }
 
 export async function updateMonitoredEndpoint(
@@ -44,31 +37,46 @@ export async function updateMonitoredEndpoint(
   userId: number,
   monitoredEndpointData: MonitoredEndpoint
 ) {
-  const dbInput = {
-    name: monitoredEndpointData.name,
-    monitored_interval: monitoredEndpointData.monitoredInterval,
-  };
   return (
     await knex("monitored_endpoints")
       .where({ id, owner_id: userId })
-      .update(dbInput)
+      .update(monitoredEndpointData)
       .returning("*")
   )[0];
 }
 
 export async function deleteMonitoredEndpoint(id: number, userId: number) {
-  const result = (
+  // TODO delete linked results with deleted endpoint
+  return (
     await knex("monitored_endpoints").where({ id, owner_id: userId }).del("*")
   )[0];
-  console.log(result);
-  return result;
 }
 
-export async function getMonitoringResults() {
+export async function getMonitoringResults(userId: number) {
   // group by endpoint
   // limit 10 per group
-  // for user
-  return await knex("monitoring_results").select().groupBy();
+  // for user by id
+
+  // TODO figure out query first
+
+  const endpointsForUser = await knex("monitoredEndpoints")
+    .select("id", "name")
+    .where({ "monitoredEndpoints.ownerId": userId });
+
+  const promises = endpointsForUser.map(async (endpoint) => {
+    const tenResults = await knex("monitoringResults")
+      .select("dateOfCheck", "returnedHttpStatusCode", "returnedPayload")
+      .where("monitoredEndpointId", endpoint.id)
+      .orderBy("monitoringResults.dateOfCheck", "desc")
+      .limit(10);
+    return {
+      endpointId: endpoint.id,
+      endpointName: endpoint.name,
+      latestMonitoringResults: tenResults,
+    };
+  });
+
+  return await Promise.all(promises);
 }
 
 export async function getUserIdFor(accessToken: string) {
@@ -77,12 +85,8 @@ export async function getUserIdFor(accessToken: string) {
   )[0];
 }
 
-export async function createMonitoringResult(data: MonitoringResult) {
-  const monitoringResultData = {
-    date_of_check: data.dateOfCheck,
-    returned_http_status_code: data.returnedHttpStatusCode,
-    returnedPayload: data.returnedPayload,
-    monitoredEndpointId: data.monitoredEndpointId,
-  }
-  return await knex("monitoring_results").insert(data);
+export async function createMonitoringResult(
+  data: Omit<MonitoringResult, "id">
+) {
+  return (await knex("monitoring_results").insert(data).returning("*"))[0];
 }

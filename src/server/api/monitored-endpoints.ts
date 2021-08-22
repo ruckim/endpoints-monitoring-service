@@ -11,8 +11,7 @@ import {
 
 export const monitoredEndpointsRouter = router();
 
-// could implement filter and sorting for getting resources
-// TODO shorten
+// TODO implement filter and sorting for getting resources
 const routes = [
   {
     method: "GET",
@@ -98,13 +97,12 @@ const routes = [
     },
     handler: async (ctx: ExtendableContext) => {
       const userId = ctx.app.context.userId;
-
+      const endpointId = parseInt(ctx.request.params.id);
       const update = {
         ...ctx.request.body,
       };
-      const id = parseInt(ctx.request.params.id);
       const updatedMonitoredEndpoint = await updateMonitoredEndpoint(
-        id,
+        endpointId,
         userId,
         update
       );

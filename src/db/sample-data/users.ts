@@ -3,7 +3,7 @@ export const users = [
     id: 1,
     username: "First User",
     email: "first.user@email.com",
-    access_token: "firstAccessToken",
+    access_token: "Bearer firstAccessToken",
   },
   {
     id: 2,

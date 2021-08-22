@@ -1,28 +1,23 @@
 const router = require("koa-joi-router");
-const Joi = router.Joi;
 import { ExtendableContext } from "koa";
-import {
-  createMonitoredEndpoint,
-  deleteMonitoredEndpoint,
-  getAllMonitoredEndpointsFor,
-  getOneMonitoredEndpointById,
-  updateMonitoredEndpoint,
+import {getMonitoringResults,
 } from "../../db/queries";
 
 export const monitoringResultsRouter = router();
 
 monitoringResultsRouter.route({
   method: "GET",
-  path: "/monitored-endpoints",
+  path: "/monitoring-results",
   handler: async (ctx: ExtendableContext) => {
-    const allMonitoredEndpoints = await getAllMonitoredEndpointsFor();
-    if (!allMonitoredEndpoints || !allMonitoredEndpoints.length) {
+    const userId = ctx.app.context.userId
+    const monitoringResults = await getMonitoringResults(userId);
+    if (!monitoringResults) {
       ctx.response.status = 404;
       ctx.response.body = "Not found";
       return;
     }
 
-    ctx.response.body = allMonitoredEndpoints;
+    ctx.response.body = monitoringResults;
     return;
   },
 });
