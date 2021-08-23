@@ -6,5 +6,5 @@ import { startMonitoring } from "./services/monitor-endpoints";
   // TODO config, test
   db;
   server;
-  // startMonitoring();
+  startMonitoring();
 })();

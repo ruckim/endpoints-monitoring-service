@@ -1,14 +1,9 @@
 import {MonitoredEndpoint} from "../data/monitored-endpoint";
+import EventEmitter from "events";
 
+export const endpointsEventEmitter = new EventEmitter();
 
 class MonitoredEndpointsDAO {
-
-    mapToDb(monitoredEndpointData: MonitoredEndpoint){
-        return {
-            date_of_creation: monitoredEndpointData.dateOfCreation,
-            dateOfLastCheck: monitoredEndpointData.dateOfLastCheck
-        }
-    }
 
     async create(monitoredEndpointData: MonitoredEndpoint) {
 

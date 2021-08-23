@@ -2,8 +2,8 @@
 export const monitoredEndpoints = [
   {
     id: 1,
-    name: "first endpoint",
-    url: "http://localhost/first-endpoint",
+    name: "chuck noris endpoint",
+    url: "https://api.chucknorris.io/jokes/random",
     date_of_creation: new Date("2020-01-25T08:40:51.620Z"),
     date_of_last_check: new Date("2020-01-26T08:40:51.620Z"),
     monitored_interval: 10,
@@ -11,8 +11,8 @@ export const monitoredEndpoints = [
   },
   {
     id: 2,
-    name: "second endpoint",
-    url: "http://localhost/second-endpoint",
+    name: "second CN endpoint",
+    url: "https://api.chucknorris.io/jokes",
     date_of_creation: new Date("2020-01-27T08:40:51.620Z"),
     date_of_last_check: new Date("2020-01-28T08:40:51.620Z"),
     monitored_interval: 5,

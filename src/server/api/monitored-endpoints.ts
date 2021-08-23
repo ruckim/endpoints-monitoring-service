@@ -8,6 +8,7 @@ import {
   getOneMonitoredEndpointById,
   updateMonitoredEndpoint,
 } from "../../db/queries";
+import { endpointsEventEmitter } from "../../dao/monitored-endpoints";
 
 export const monitoredEndpointsRouter = router();
 
@@ -75,6 +76,7 @@ const routes = [
       const createdMonitoredEndpoint = await createMonitoredEndpoint(
         requestMonitoredEndpointData
       );
+      endpointsEventEmitter.emit("addedNewEndpoint", createdMonitoredEndpoint);
 
       ctx.response.status = 201;
       ctx.response.body = createdMonitoredEndpoint;
@@ -103,14 +105,15 @@ const routes = [
       };
       const updatedMonitoredEndpoint = await updateMonitoredEndpoint(
         endpointId,
-        userId,
-        update
+        update,
+        userId
       );
       if (!updatedMonitoredEndpoint) {
         ctx.response.status = 404;
         ctx.response.body = "Not found";
         return;
       }
+      endpointsEventEmitter.emit("modifiedEndpoint", updatedMonitoredEndpoint);
 
       ctx.response.body = updatedMonitoredEndpoint;
       return;
@@ -137,6 +140,8 @@ const routes = [
         ctx.response.body = "Not found";
         return;
       }
+
+      endpointsEventEmitter.emit("deletedEndpoint", id);
 
       ctx.response.body = deletedMonitoredEndpoint;
       return;

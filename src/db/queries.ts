@@ -2,6 +2,8 @@ import { connection as knex } from "./knex";
 import { MonitoredEndpoint } from "../data/monitored-endpoint";
 import { MonitoringResult } from "../data/monitoring-result";
 
+// TODO use queries in objects managing communication with db
+
 export async function getAllMonitoredEndpoints() {
   return await knex("monitored_endpoints").select();
 }
@@ -34,12 +36,12 @@ export async function createMonitoredEndpoint(
 
 export async function updateMonitoredEndpoint(
   id: number,
-  userId: number,
-  monitoredEndpointData: MonitoredEndpoint
+  monitoredEndpointData: Partial<MonitoredEndpoint>,
+  userId?: number
 ) {
   return (
     await knex("monitored_endpoints")
-      .where({ id, owner_id: userId })
+      .where({ id, ...(userId && { owner_id: userId }) })
       .update(monitoredEndpointData)
       .returning("*")
   )[0];
@@ -63,7 +65,7 @@ export async function getMonitoringResults(userId: number) {
     .select("id", "name")
     .where({ "monitoredEndpoints.ownerId": userId });
 
-  const promises = endpointsForUser.map(async (endpoint) => {
+  const promisesMonitoringResults = endpointsForUser.map(async (endpoint) => {
     const tenResults = await knex("monitoringResults")
       .select("dateOfCheck", "returnedHttpStatusCode", "returnedPayload")
       .where("monitoredEndpointId", endpoint.id)
@@ -76,7 +78,7 @@ export async function getMonitoringResults(userId: number) {
     };
   });
 
-  return await Promise.all(promises);
+  return await Promise.all(promisesMonitoringResults);
 }
 
 export async function getUserIdFor(accessToken: string) {

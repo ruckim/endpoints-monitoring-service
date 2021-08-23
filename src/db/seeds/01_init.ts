@@ -10,5 +10,11 @@ export async function seed(knex: Knex): Promise<void> {
 
   await knex("users").insert(users);
   await knex("monitored_endpoints").insert(monitoredEndpoints);
+  await knex.raw(
+    "SELECT setval('monitored_endpoints_id_seq', (SELECT MAX(id) from \"monitored_endpoints\"));"
+  );
   await knex("monitoring_results").insert(monitoringResults);
+  await knex.raw(
+      "SELECT setval('monitoring_results_id_seq', (SELECT MAX(id) from \"monitoring_results\"));"
+  );
 }

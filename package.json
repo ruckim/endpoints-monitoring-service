@@ -9,7 +9,11 @@
     "start:watch": "nodemon",
     "test:with-db": "(dropdb --if-exists test-endpoints-monitoring-service && createdb test-endpoints-monitoring-service ) && NODE_ENV=test mocha",
     "test": "NODE_ENV=test mocha",
-    "build": "tsc"
+    "build": "tsc",
+    "knex:migrate:latest": "knex migrate:latest",
+    "knex:migrate:rollback": "knex migrate:rollback",
+    "knex:seed:run": "knex seed:run",
+    "knex:seed:run:users": "knex seed:run --specific=02_users.ts"
   },
   "repository": {
     "type": "git",
@@ -42,6 +46,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/got": "^9.6.12",
     "@types/koa": "^2.13.4",
+    "@types/koa-bodyparser": "^4.3.3",
     "@types/koa-joi-router": "^8.0.1",
     "@types/lodash": "^4.14.172",
     "@types/mocha": "^9.0.0",
@@ -59,7 +64,8 @@
   "mocha": {
     "require": "ts-node/register",
     "spec": [
-      "./src/**/*.spec.ts"
+      "./src/**/*.spec.ts",
+      "--exit"
     ]
   },
   "nodemonConfig": {

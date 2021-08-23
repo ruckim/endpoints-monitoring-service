@@ -1,7 +1,10 @@
 import got from "got";
 import { MonitoredEndpoint } from "../../data/monitored-endpoint";
 import { MonitoringResult } from "../../data/monitoring-result";
-import { createMonitoringResult } from "../../db/queries";
+import {
+  createMonitoringResult,
+  updateMonitoredEndpoint,
+} from "../../db/queries";
 
 export class EndpointMonitor {
   endpointId: number;
@@ -56,8 +59,12 @@ export class EndpointMonitor {
     };
   }
 
-  async save(resultData: Omit<MonitoringResult, "id">) {
+  async saveResult(resultData: Omit<MonitoringResult, "id">) {
     await createMonitoringResult(resultData);
+  }
+
+  async updateEndpointLastCheckDate(endpointId: number, date: Date) {
+    await updateMonitoredEndpoint(endpointId, { dateOfLastCheck: date });
   }
 
   start() {
@@ -69,8 +76,11 @@ export class EndpointMonitor {
       setInterval(async () => {
         const monitoringResultData: Omit<MonitoringResult, "id"> =
           await this.callEndpoint(this.url);
-        await this.save(monitoringResultData);
-        // update date of last check
+        await this.saveResult(monitoringResultData);
+        await this.updateEndpointLastCheckDate(
+          this.endpointId,
+          monitoringResultData.dateOfCheck
+        );
       }, this.frequencyInMs);
     }, msToWait);
   }

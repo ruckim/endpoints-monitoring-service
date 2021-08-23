@@ -1,16 +1,34 @@
 import { getAllMonitoredEndpoints } from "../../db/queries";
 import { EndpointMonitor } from "./endpoint-monitor";
+import { endpointsEventEmitter } from "../../dao/monitored-endpoints";
+import { MonitoredEndpoint } from "../../data/monitored-endpoint";
 
 export async function startMonitoring() {
-  const endpoints = await getAllMonitoredEndpoints();
+  const endpoints: MonitoredEndpoint[] = await getAllMonitoredEndpoints();
 
-  const runningMonitors = endpoints.map((endpoint) =>
-    new EndpointMonitor(endpoint).start()
-  );
+  const runningMonitors: {
+    [key in number]: EndpointMonitor;
+  } = {};
 
-  // use event listener listening on event endpoint modified, which triggers loading endpoint to monitor
+  for (const endpoint of endpoints) {
+    runningMonitors[endpoint.id] = new EndpointMonitor(endpoint);
+    runningMonitors[endpoint.id].start();
+  }
 
-  // what if new endpoint is added
-  // endpoint is modified/created -> load new data to monitor
-  // probably invoking in some keeper
+  endpointsEventEmitter.on("addedNewEndpoint", (endpoint) => {
+    runningMonitors[endpoint.id] = new EndpointMonitor(endpoint);
+    runningMonitors[endpoint.id].start();
+    console.log("added", runningMonitors);
+  });
+
+  endpointsEventEmitter.on("modifiedEndpoint", (endpoint) => {
+    runningMonitors[endpoint.id] = new EndpointMonitor(endpoint);
+    runningMonitors[endpoint.id].start();
+    console.log("modified", runningMonitors);
+  });
+
+  endpointsEventEmitter.on("deletedEndpoint", (endpointId) => {
+    delete runningMonitors[endpointId];
+    console.log("deleted", runningMonitors);
+  });
 }

@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
       table.increments("id").primary();
       table.text("username");
       table.text("email");
-      table.text("access_token");
+      table.uuid("access_token");
     })
     .createTable("monitored_endpoints", (table) => {
       table.increments("id").primary();
@@ -28,7 +28,8 @@ export async function up(knex: Knex): Promise<void> {
       table
         .integer("monitored_endpoint_id")
         .references("id")
-        .inTable("monitored_endpoints");
+        .inTable("monitored_endpoints")
+        .onDelete("CASCADE");
     });
 }
 
