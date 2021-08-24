@@ -8,7 +8,7 @@ import {
   getOneMonitoredEndpointById,
   updateMonitoredEndpoint,
 } from "../../db/queries";
-import { endpointsEventEmitter } from "../../dao/monitored-endpoints";
+import { endpointsEventEmitter } from "../../events/monitored-endpoints";
 
 export const monitoredEndpointsRouter = router();
 
@@ -63,7 +63,7 @@ const routes = [
         name: Joi.string().required(),
         url: Joi.string().required(),
         // TODO causion! duplicating information from model - test at least that this validation and model in sync
-        monitoredInterval: Joi.number().optional(),
+        monitoredInterval: Joi.number().required(),
       },
       type: "json",
     },

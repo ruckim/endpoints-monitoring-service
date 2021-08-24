@@ -5,33 +5,63 @@ import { MonitoringResult } from "../data/monitoring-result";
 // TODO use queries in objects managing communication with db
 
 export async function getAllMonitoredEndpoints() {
-  return await knex("monitored_endpoints").select();
+  try {
+    return await knex("monitored_endpoints").select();
+  } catch (e) {
+    console.error({
+      message: "Getting monitored endpoints from db failed",
+      error: e,
+    });
+    return [];
+  }
 }
 
 export async function getAllMonitoredEndpointsFor(userId: number) {
-  return await knex("monitored_endpoints").select().where({ owner_id: userId });
+  try {
+    return await knex("monitored_endpoints")
+      .select()
+      .where({ owner_id: userId });
+  } catch (e) {
+    console.error({
+      message: `Getting monitored endpoints for user userId: ${userId} failed`,
+      error: e,
+    });
+  }
 }
 
 export async function getOneMonitoredEndpointById(
   endpointId: number,
   userId: number
 ) {
-  return (
-    await knex("monitored_endpoints").where({
-      id: endpointId,
-      owner_id: userId,
-    })
-  )[0];
+  try {
+    return (
+      await knex("monitored_endpoints").where({
+        id: endpointId,
+        owner_id: userId,
+      })
+    )[0];
+  } catch (e) {
+    console.error({
+      message: `Failed getting monitored endpoint by id ${endpointId} for user with id ${userId}`,
+    });
+  }
 }
 
 export async function createMonitoredEndpoint(
   monitoredEndpointData: MonitoredEndpoint
 ) {
-  return (
-    await knex("monitored_endpoints")
-      .insert(monitoredEndpointData)
-      .returning("*")
-  )[0];
+  try {
+    return (
+      await knex("monitored_endpoints")
+        .insert(monitoredEndpointData)
+        .returning("*")
+    )[0];
+  } catch (e) {
+    console.error({
+      message: `Failed creating monitored endpoint`,
+      error: e,
+    });
+  }
 }
 
 export async function updateMonitoredEndpoint(

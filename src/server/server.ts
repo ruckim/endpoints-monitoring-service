@@ -1,14 +1,10 @@
 import "dotenv/config";
 import Koa = require("koa");
-import { mountApiVersion } from "./api/versions/api-v1";
-import { monitoredEndpointsRouter } from "./api/monitored-endpoints";
-import { config } from "../config/config";
+import { config } from "../config";
 import { auth } from "./middlewares/authentication";
-import { monitoringResultsRouter } from "./api/monitoring-results";
+import { restApiRouterV1 } from "./api/rest-api-v1";
 const { bearerToken } = require("koa-bearer-token");
 const morgan = require("koa-morgan");
-
-const PORT = config.PORT;
 
 const app = new Koa();
 
@@ -17,11 +13,9 @@ app.use(auth);
 app.use(morgan("tiny"));
 
 // TODO idempotency
-// figure out /api/v1/
-app.use(monitoredEndpointsRouter.middleware());
-app.use(monitoringResultsRouter.middleware());
-// mountApiVersion(1, app);
+app.use(restApiRouterV1.middleware());
 
+const PORT = config.PORT;
 export const server = app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);
 });

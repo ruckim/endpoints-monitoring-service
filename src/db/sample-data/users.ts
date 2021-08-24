@@ -1,14 +1,14 @@
 export const users = [
   {
     id: 1,
-    username: "First User",
-    email: "first.user@email.com",
-    access_token: "df85575a-0456-11ec-9a03-0242ac130003",
+    username: "DX Heroes",
+    email: "info@dxheroes.io",
+    access_token: "93f39e2f-80de-4033-99ee-249d92736a25",
   },
   {
     id: 2,
-    username: "Second User",
-    email: "second.user@email.com",
-    access_token: "e87ef370-0456-11ec-9a03-0242ac130003",
+    username: "Batman",
+    email: "batman@example.com",
+    access_token: "dcb20f8a-5657-4f1b-9f7f-ce65739b359e",
   },
 ];
