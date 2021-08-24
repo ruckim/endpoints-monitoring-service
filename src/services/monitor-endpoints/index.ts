@@ -21,12 +21,16 @@ export async function startMonitoring() {
   });
 
   endpointsEventEmitter.on("modifiedEndpoint", (endpoint) => {
+    const oldMonitor = runningMonitors[endpoint.id];
+    oldMonitor.stop();
     delete runningMonitors[endpoint.id];
     runningMonitors[endpoint.id] = new EndpointMonitor(endpoint);
     runningMonitors[endpoint.id].start();
   });
 
   endpointsEventEmitter.on("deletedEndpoint", (endpointId) => {
+    const oldMonitor = runningMonitors[endpointId];
+    oldMonitor.stop();
     delete runningMonitors[endpointId];
   });
 }

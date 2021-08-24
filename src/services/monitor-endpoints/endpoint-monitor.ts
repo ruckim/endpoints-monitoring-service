@@ -12,6 +12,7 @@ export class EndpointMonitor {
   frequencyInMs: number;
   url: string;
   lastCheckedAt?: Date;
+  monitorId?: any;
 
   constructor(endpoint: MonitoredEndpoint) {
     this.endpointId = endpoint.id;
@@ -73,7 +74,7 @@ export class EndpointMonitor {
       this.lastCheckedAt
     );
     setTimeout(() => {
-      setInterval(async () => {
+      this.monitorId = setInterval(async () => {
         const monitoringResultData: Omit<MonitoringResult, "id"> =
           await this.callEndpoint(this.url);
         await this.saveResult(monitoringResultData);
@@ -83,5 +84,9 @@ export class EndpointMonitor {
         );
       }, this.frequencyInMs);
     }, msToWait);
+  }
+
+  stop() {
+    clearInterval(this.monitorId);
   }
 }

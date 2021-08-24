@@ -15,7 +15,7 @@ app.use(morgan("tiny"));
 // TODO idempotency
 app.use(restApiRouterV1.middleware());
 
-const PORT = config.PORT;
+const PORT = config.PORT || 3000;
 export const server = app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);
 });

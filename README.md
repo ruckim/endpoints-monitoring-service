@@ -34,8 +34,9 @@ only belonging `Monitoring Results`.
 1. run `npm install` to install all necessary dependencies
 2. run `npm run knex:migrate:latest` to migrate db
 3. run `npm run knex:seed:run:users` to populate DB with users
-4. 
-5. use API as specified
+4. run `npm run build`
+5. run `npm start`
+6. use API as specified
 
 ## API
 
