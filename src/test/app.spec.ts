@@ -5,12 +5,12 @@ import { connection as knex } from "../db/knex";
 
 chai.use(chaiHttp);
 
-const accessToken = "e87ef370-0456-11ec-9a03-0242ac130003";
+const accessToken = "dcb20f8a-5657-4f1b-9f7f-ce65739b359e";
 describe("app", () => {
   it("should list all monitored-endpoints on GET", (done) => {
     chai
       .request(server)
-      .get("/monitored-endpoints")
+      .get("/api/v1/monitored-endpoints")
       .set("Authorization", "Bearer " + accessToken)
       .end((err, res) => {
         chai.expect(res.status).to.be.equal(200);
@@ -23,7 +23,7 @@ describe("app", () => {
   it("should list one monitored-endpoints on GET by id", (done) => {
     chai
       .request(server)
-      .get("/monitored-endpoints/2")
+      .get("/api/v1/monitored-endpoints/2")
       .set("Authorization", "Bearer " + accessToken)
       .end((err, res) => {
         chai.expect(res.status).to.be.equal(200);
@@ -36,7 +36,7 @@ describe("app", () => {
   it("should create one monitored-endpoints on POST", (done) => {
     chai
       .request(server)
-      .post("/monitored-endpoints")
+      .post("/api/v1/monitored-endpoints")
       .send({
         name: "testing endpoint",
         url: "http://test-url.com",
@@ -57,7 +57,7 @@ describe("app", () => {
   it("should update one monitored-endpoints on PATCH", (done) => {
     chai
       .request(server)
-      .patch("/monitored-endpoints/3")
+      .patch("/api/v1/monitored-endpoints/3")
       .send({
         name: "new endpoint name",
       })
@@ -75,7 +75,7 @@ describe("app", () => {
   it("should delete monitored-endpoint on DELETE", async () => {
     const result = await chai
       .request(server)
-      .delete("/monitored-endpoints/3")
+      .delete("/api/v1/monitored-endpoints/3")
       .set("Authorization", "Bearer " + accessToken)
       .set("content-type", "application/json");
 
@@ -92,7 +92,7 @@ describe("app", () => {
   beforeEach(async () => {
     await knex.migrate.rollback();
     await knex.migrate.latest();
-    await knex.seed.run();
+    await knex.seed.run({ specific: "01_init.ts" });
   });
 
   afterEach(async () => {
